@@ -13,6 +13,7 @@ import java.util.List;
 @Controller
 public class SettleUpController {
     public SettleUpGroupResponseDTO settleUpGroup(SettleUpGroupRequestDTO settleUpGroupRequestDTO) {
+
         return null;
     }
 

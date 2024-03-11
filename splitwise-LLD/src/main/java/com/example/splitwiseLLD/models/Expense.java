@@ -1,5 +1,6 @@
 package com.example.splitwiseLLD.models;
 
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -7,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter @Setter @Entity
 public class Expense extends BaseModel {
@@ -17,13 +19,19 @@ public class Expense extends BaseModel {
     @ManyToOne
     private User createdBy;
 
-    @OneToMany(mappedBy = "expense")
-    private List<ExpenseUser> expenseUsers;
+//    @OneToMany(mappedBy = "expense")
+//    private List<ExpenseUser> expenseUsers;
+//
+//    @ManyToOne
+//    private Group group;
+//
+//    private ExpenseType expenseType;
+    @ElementCollection
+    private Map<User, Integer> paidBy;
 
-    @ManyToOne
-    private Group group;
+    @ElementCollection
+    private Map<User, Integer> hadToPay;
 
-    private ExpenseType expenseType;
 
 }
 
