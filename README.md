@@ -1,1 +1,1 @@
-# splitwise (Using Spring boot)
+# SplitWise (Using Spring boot)
