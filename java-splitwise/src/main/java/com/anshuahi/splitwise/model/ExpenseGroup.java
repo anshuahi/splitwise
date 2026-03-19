@@ -3,6 +3,7 @@ package com.anshuahi.splitwise.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class ExpenseGroup {
     private Long id;
     private Long createdBy;
     private String name;
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToMany
     @JoinTable(
@@ -22,5 +23,10 @@ public class ExpenseGroup {
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> userList;
+    private List<User> users;
+
+    @PrePersist
+    public void prePersist(){
+        this.createdAt = LocalDateTime.now();
+    }
 }

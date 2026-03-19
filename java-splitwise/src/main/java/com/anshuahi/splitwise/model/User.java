@@ -1,11 +1,14 @@
 package com.anshuahi.splitwise.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -27,4 +30,8 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "users")
+    private Set<ExpenseGroup> groups;
 }

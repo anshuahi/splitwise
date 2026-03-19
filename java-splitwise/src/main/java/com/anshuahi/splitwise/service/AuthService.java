@@ -3,6 +3,7 @@ package com.anshuahi.splitwise.service;
 import com.anshuahi.splitwise.dto.AuthResponse;
 import com.anshuahi.splitwise.dto.LoginRequest;
 import com.anshuahi.splitwise.dto.SignupRequest;
+import com.anshuahi.splitwise.dto.UserDto;
 import com.anshuahi.splitwise.model.User;
 import com.anshuahi.splitwise.repository.UserRepository;
 import com.anshuahi.splitwise.utils.JwtUtil;
@@ -33,7 +34,7 @@ public class AuthService {
                 .build();
         userRepository.save(user);
         String token = jwtUtil.generateToken(user.getPhone());
-        return new AuthResponse(token, user.getName());
+        return new AuthResponse(token, new UserDto(user));
     }
 
     public AuthResponse loginUser(LoginRequest loginRequest){
@@ -43,7 +44,7 @@ public class AuthService {
             throw new RuntimeException("Invalid Credentials");
         }
         String token = jwtUtil.generateToken(user.getPhone());
-        return new AuthResponse(token, user.getName());
+        return new AuthResponse(token, new UserDto(user));
     }
 
 }

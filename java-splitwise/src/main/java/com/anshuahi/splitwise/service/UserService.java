@@ -15,11 +15,16 @@ public class UserService {
     private UserRepository userRepository;
 
     public List<User> searchUsers(String prefix){
-        return userRepository.searchUsers(prefix);
+        return userRepository.searchByNameOrPhonePrefix(prefix);
     }
 
     public User getUser(String phone){
         return userRepository.findByPhone(phone)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+    }
+
+    public User getUserByName(String name){
+        return userRepository.findByName(name)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with name: " + name));
     }
 }
