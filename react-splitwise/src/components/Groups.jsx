@@ -1,13 +1,16 @@
 import { useState } from "react";
 import CreateGroupModal from "./modals/CreateGroupModal";
 import api from "../api";
+import { useAuth } from "../context/AuthContext";
 
 function Groups() {
+    const {user} = useAuth();
     const createNewGroup = async(groupName, members) => {
         try {
-            const response = await api.post("/users/create-group", {
+            const response = await api.post("/groups/create-group", {
                 name: groupName,
-                users: members//.map(member => member.id),
+                createdBy: user.id,
+                userIds: members.map(member => member.id),
             });
             console.log("Group created successfully:", response.data);
         }

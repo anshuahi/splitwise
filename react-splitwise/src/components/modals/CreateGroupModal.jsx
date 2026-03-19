@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 function CreateGroupModal({ isOpen, onClose, onCreate }) {
     const {user} = useAuth();
     const [groupName, setGroupName] = useState("");
-    const [members, setMembers] = useState([user]);
+    const [members, setMembers] = useState([]);
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
 
@@ -15,6 +15,10 @@ function CreateGroupModal({ isOpen, onClose, onCreate }) {
         setGroupName("");
         setMembers([user]);
     }
+
+    useEffect(() => {
+        setMembers([user]);
+    }, [user])
 
     const handleSearch = async (value) => {
         setQuery(value);
