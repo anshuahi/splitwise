@@ -10,10 +10,6 @@ function Navbar() {
         navigate("/login");
     }
 
-    useEffect(() => {
-        console.log("Navbar user:", user); 
-    }, [user]);
-
     return (
         <nav style={styles.nav}>
             <Link to="/" style={styles.link}>SplitWise</Link>

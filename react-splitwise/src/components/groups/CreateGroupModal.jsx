@@ -14,6 +14,7 @@ function CreateGroupModal({ isOpen, onClose, onCreate }) {
         onCreate(groupName, members);
         setGroupName("");
         setMembers([user]);
+        onClose();
     }
 
     useEffect(() => {

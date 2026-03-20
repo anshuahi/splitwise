@@ -3,8 +3,9 @@ import Login from "./components/auth/LoginPage";
 import Navbar from "./components/Navbar";
 import Registration from "./components/auth/SignupPage";
 import Home from "./components/HomePage";
-import Groups from "./components/Groups";
+import Groups from "./components/groups/Groups";
 import Expenses from "./components/Expenses";
+import GroupDetails from "./components/groups/GroupDetails";
 
 
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="/register" element={<Registration />} />
         <Route path="/groups" element={<Groups />} />
         <Route path="/expenses" element={<Expenses />} />
+        <Route path="/groups/:id" element={<GroupDetails />} />
       </Routes>
     </BrowserRouter>
   );
