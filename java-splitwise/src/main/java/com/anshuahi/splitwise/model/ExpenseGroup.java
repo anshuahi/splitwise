@@ -13,7 +13,10 @@ public class ExpenseGroup {
     @Id
     @GeneratedValue
     private Long id;
-    private Long createdBy;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by") // FK column
+    private User createdBy;
     private String name;
     private LocalDateTime createdAt;
 

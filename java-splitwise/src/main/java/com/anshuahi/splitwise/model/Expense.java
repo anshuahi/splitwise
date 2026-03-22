@@ -13,7 +13,12 @@ public class Expense {
     @GeneratedValue
     private Long id;
 
+//    @ManyToOne()
+//    private Long userId
+
     private Long groupId;
+
+    private Double totalAmount;
 
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Split> splitList;

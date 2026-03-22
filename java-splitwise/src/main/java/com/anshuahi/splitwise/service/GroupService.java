@@ -1,8 +1,6 @@
 package com.anshuahi.splitwise.service;
 
-import com.anshuahi.splitwise.dto.CreateGroupDto;
-import com.anshuahi.splitwise.dto.CreateGroupRequest;
-import com.anshuahi.splitwise.dto.UserDto;
+import com.anshuahi.splitwise.dto.*;
 import com.anshuahi.splitwise.model.ExpenseGroup;
 import com.anshuahi.splitwise.model.User;
 import com.anshuahi.splitwise.repository.GroupRepository;
@@ -47,11 +45,23 @@ public class GroupService {
         ExpenseGroup group = new ExpenseGroup();
         group.setName(request.getName());
         group.setUsers(users);
-        group.setCreatedBy(request.getCreatedBy());
+        group.setCreatedBy(user);
 
         CreateGroupDto dto = new CreateGroupDto(groupRepository.save(group));
         dto.setCreatedBy(new UserDto(user));
 //        return "Group created successfully";
         return dto;
+    }
+
+    public List<ExpenseGroupDto> fetchGroups(Long id){
+        List<ExpenseGroup> groups = groupRepository.findByUsersId(id);
+        return groups.stream()
+                .map(ExpenseGroupDto::new).toList();
+    }
+
+    public GroupDetailsDto fetchGroupDetails(Long id) {
+         ExpenseGroup group = groupRepository.findById(id)
+                 .orElseThrow(() -> new RuntimeException("No group found with group-id: " + id));
+         return new GroupDetailsDto(new ExpenseGroupDto(group), null);
     }
 }

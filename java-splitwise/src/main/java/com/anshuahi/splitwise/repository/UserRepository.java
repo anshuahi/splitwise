@@ -12,6 +12,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByPhone(String phone);
     Optional<User> findByName(String phone);
     List<User> findAllByPhone(String phone);
+
+
+
     @Query("SELECT u FROM User u WHERE LOWER(u.name) LIKE %:prefix% OR u.phone LIKE %:prefix%")
     List<User> searchByNameOrPhonePrefix(@Param("prefix") String prefix);
 //    @Query("""

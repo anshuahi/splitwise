@@ -14,7 +14,7 @@ public class Split {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private double amount;
+    private Double amount;
 
     @ManyToOne
     @JoinColumn(name = "expense_id")
