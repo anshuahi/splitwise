@@ -9,6 +9,7 @@ import java.util.List;
 //@NoArgsConstructor
 public class ExpenseDto {
     private String description;
+    private Long groupId;
     private Long paidBy;
     private Long addedBy;
     private Double totalAmount;

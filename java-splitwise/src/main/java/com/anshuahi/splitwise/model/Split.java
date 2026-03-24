@@ -1,10 +1,15 @@
 package com.anshuahi.splitwise.model;
 
+import com.anshuahi.splitwise.dto.SplitDto;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class Split {
     @Id
     @GeneratedValue
