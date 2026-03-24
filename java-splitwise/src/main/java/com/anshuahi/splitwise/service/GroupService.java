@@ -1,8 +1,10 @@
 package com.anshuahi.splitwise.service;
 
 import com.anshuahi.splitwise.dto.*;
+import com.anshuahi.splitwise.model.Expense;
 import com.anshuahi.splitwise.model.ExpenseGroup;
 import com.anshuahi.splitwise.model.User;
+import com.anshuahi.splitwise.repository.ExpenseRepository;
 import com.anshuahi.splitwise.repository.GroupRepository;
 import com.anshuahi.splitwise.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,9 @@ public class GroupService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ExpenseRepository expenseRepository;
 
     public CreateGroupDto createGroup(CreateGroupRequest request){
         // 1. validate input
@@ -62,6 +67,17 @@ public class GroupService {
     public GroupDetailsDto fetchGroupDetails(Long id) {
          ExpenseGroup group = groupRepository.findById(id)
                  .orElseThrow(() -> new RuntimeException("No group found with group-id: " + id));
-         return new GroupDetailsDto(new ExpenseGroupDto(group), null);
+         List<ExpenseResponseDto> expenses = expenseRepository.findByExpenseGroupId(id)
+                 .stream().map(
+                         ExpenseResponseDto::new
+                 ).toList();
+         return new GroupDetailsDto(new ExpenseGroupDto(group), expenses);
+    }
+
+    public String deleteGroupById(Long id){
+        ExpenseGroup group = groupRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Group with " + id + "not found"));
+        groupRepository.delete(group);
+        return "Group deleted!";
     }
 }

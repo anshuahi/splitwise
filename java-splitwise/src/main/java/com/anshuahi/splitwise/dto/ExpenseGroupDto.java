@@ -13,6 +13,7 @@ public class ExpenseGroupDto {
     private List<UserDto> members;
     private String groupName;
     private LocalDateTime createdAt;
+//    private List<Expense>
 
     public ExpenseGroupDto(ExpenseGroup group) {
         this.id = group.getId();

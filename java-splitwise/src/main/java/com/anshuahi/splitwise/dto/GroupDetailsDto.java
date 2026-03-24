@@ -10,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 public class GroupDetailsDto {
     private ExpenseGroupDto expenseGroupDto;
-    private List<ExpenseDto> expenses;
+    private List<ExpenseResponseDto> expenses;
 }

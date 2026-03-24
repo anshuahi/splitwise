@@ -36,4 +36,10 @@ public class GroupController {
     public ResponseEntity<GroupDetailsDto> getGroupDetails(@PathVariable Long id){
         return ResponseEntity.ok(groupService.fetchGroupDetails(id));
     }
+
+    @DeleteMapping("/delete-group/{id}")
+    public  ResponseEntity<String> deleteGroup(@PathVariable Long id){
+        System.out.println(id);
+        return ResponseEntity.ok(groupService.deleteGroupById(id));
+    }
 }
