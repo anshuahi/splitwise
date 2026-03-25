@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import api from "../../api";
 import { useAuth } from "../../context/AuthContext";
 
-function CreateGroupModal({ isOpen, onClose, onCreate }) {
-    const {user} = useAuth();
+function CreateGroupModal({ isOpen, onClose, onCreate, isEdit, groupData }) {
+    const { user } = useAuth();
     const [groupName, setGroupName] = useState("");
     const [members, setMembers] = useState([]);
     const [query, setQuery] = useState("");
@@ -11,15 +11,28 @@ function CreateGroupModal({ isOpen, onClose, onCreate }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onCreate(groupName, members);
-        setGroupName("");
-        setMembers([user]);
+        
+        if(isEdit) {
+            onCreate(groupName, members,  groupData?.id);
+        }
+        else {
+            onCreate(groupName, members);
+        }
         onClose();
     }
 
     useEffect(() => {
-        setMembers([user]);
-    }, [user])
+        console.log(isEdit, groupData);
+        if (isEdit && groupData) {
+            setGroupName(groupData.groupName);
+            setMembers(groupData.members);
+        } else {
+            setGroupName("");
+            setMembers([user]);
+        }
+    }, [groupData, isEdit, user]);
+
+
 
     const handleSearch = async (value) => {
         setQuery(value);
@@ -94,7 +107,7 @@ function CreateGroupModal({ isOpen, onClose, onCreate }) {
                         {members.map((m) => (
                             <span key={m.id} style={styles.tag}>
                                 {m.name}
-                                <button style={{marginLeft:"5px", }} onClick={() => removeMember(m.id)}>x</button>
+                                <button style={{ marginLeft: "5px", }} onClick={() => removeMember(m.id)}>x</button>
                             </span>
                         ))}
                     </div>
@@ -110,44 +123,45 @@ function CreateGroupModal({ isOpen, onClose, onCreate }) {
 }
 
 const styles = {
-  overlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    background: "rgba(0,0,0,0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modal: {
-    background: "white",
-    padding: "20px",
-    borderRadius: "8px",
-    width: "350px",
-  },
-  dropdown: {
-    border: "1px solid #ccc",
-    maxHeight: "150px",
-    overflowY: "auto",
-    background: "white",
-  },
-  dropdownItem: {
-    padding: "8px",
-    cursor: "pointer",
-  },
-  tag: {
-    display: "inline-block",
-    padding: "5px",
-    margin: "5px",
-    background: "#eee",
-    borderRadius: "5px",
-  },
-  actions: {
-    marginTop: "10px",
-    display: "flex",
-    gap: "10px",
-  },
+    overlay: {
+        zIndex: 1000,
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        background: "rgba(0,0,0,0.5)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    modal: {
+        background: "white",
+        padding: "20px",
+        borderRadius: "8px",
+        width: "350px",
+    },
+    dropdown: {
+        border: "1px solid #ccc",
+        maxHeight: "150px",
+        overflowY: "auto",
+        background: "white",
+    },
+    dropdownItem: {
+        padding: "8px",
+        cursor: "pointer",
+    },
+    tag: {
+        display: "inline-block",
+        padding: "5px",
+        margin: "5px",
+        background: "#eee",
+        borderRadius: "5px",
+    },
+    actions: {
+        marginTop: "10px",
+        display: "flex",
+        gap: "10px",
+    },
 };
 export default CreateGroupModal;

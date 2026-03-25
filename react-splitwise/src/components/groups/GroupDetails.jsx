@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../../api";
 import { useParams } from "react-router-dom";
 import AddExpenseModal from "../expenses/AddExpenseModal";
+import { Card, Chip, Typography } from "@mui/material";
 
 function GroupDetails() {
     const { id } = useParams();
@@ -9,23 +10,68 @@ function GroupDetails() {
     const [expenses, setExpenses] = useState([]);
     const [isAddExpenseModalOpen, setIsAddExpenseModalOpen] = useState(false);
 
-    useEffect(() => {
-        const fetchGroupDetails = async () => {
-            try {
-                const response = await api.get(`/groups/${id}`);
-                console.log(response.data);
-                setGroup(response.data.expenseGroupDto);
-            } catch (error) {
-                console.error("Error fetching group details:", error);
-            }
-        };
 
-        fetchGroupDetails();
+    const fetchGroupDetails = async (id) => {
+        try {
+            const response = await api.get(`/groups/${id}`);
+            setGroup(response.data);
+        } catch (error) {
+            console.error("Error fetching group details:", error);
+        }
+    };
+
+    const fetchGroupExpenses = async (id) => {
+        try {
+            const response = await api.get(`/expenses/group-expenses/${id}`);
+            setExpenses(response.data);
+        } catch (error) {
+            console.error("Error fetching group expenses:", error);
+        }
+    }
+    useEffect(() => {
+        fetchGroupDetails(id);
+        fetchGroupExpenses(id);
     }, [id]);
 
-    const addExpense = () => {
+    const addExpense = (
+        description,
+        amount,
+        groupId,
+        paidBy,
+        splitBetween,
+        splitType
+    ) => {
         // Logic to add a new expense to the group
-        console.log("Add expense clicked for group:", id);
+        const formdata = {
+            description,
+            amount,
+            groupId,
+            paidBy,
+            addedBy: paidBy,
+            splitBetween,
+            splitType
+        }
+
+    
+        const addExpenseToGroup = async () => {
+            try {
+                const response = await api.post("/expenses/add-expense", {
+                    description,
+                    groupId,
+                    totalAmount: amount,
+                    paidBy,
+                    membersContributed: splitBetween,
+                    splitType,
+                    addedBy: paidBy
+                }
+                );
+                fetchGroupExpenses(id);
+                // Optionally, you can fetch the updated group details here to reflect the new expense
+            } catch (error) {
+                console.error("Error adding expense:", error);
+            }
+        };
+        addExpenseToGroup();
     }
 
     if (!group) return <p>Loading...</p>;
@@ -39,10 +85,10 @@ function GroupDetails() {
                         <h3>Expenses:</h3>
                         <button
                             onClick={() => setIsAddExpenseModalOpen(true)}
-                            style={{ 
-                                height: "40px", 
-                                margin: "auto 50px", 
-                                borderRadius: "15px", 
+                            style={{
+                                height: "40px",
+                                margin: "auto 50px",
+                                borderRadius: "15px",
                                 padding: "10px 20px",
                                 background: "#4CAF50",
                             }}
@@ -52,21 +98,47 @@ function GroupDetails() {
                         <AddExpenseModal
                             group={group}
                             isOpen={isAddExpenseModalOpen}
-                            onClose={() => {setIsAddExpenseModalOpen(false)}}
-                            onCreate={() => {addExpense}}
+                            onClose={() => { setIsAddExpenseModalOpen(false) }}
+                            onCreate={addExpense}
                         />
                     </div>
-                    <ul>
-                        {/* {group.expenses.map(expense => (
-                            <li key={expense.id}>{expense.description} - ${expense.amount}</li>
-                        ))} */}
-                    </ul>
+                    <div>
+                        {expenses.map((expense) => (
+                            <Card
+                                key={expense.id}
+                                style={{ padding: "10px", margin: "30px", width: "400px" }}
+                            >
+                                {/* Header */}
+                                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <Typography variant="h6" style={{ fontWeight: "900" }}>
+                                        {expense.description}
+                                    </Typography>
+
+                                    <Typography>
+                                        ₹{expense.totalAmount} (Paid By: {expense.paidBy?.name})
+                                    </Typography>
+                                </div>
+
+                                {/* Members */}
+                                <div style={{ marginTop: "10px" }}>
+                                    {expense.memberContribution?.map((member) => (
+                                        <Chip key={member.memberId} label={`${member.user.name} : ₹${member.amount}`} style={{ margin: "5px" }}>
+
+                                        </Chip>
+                                    ))}
+                                </div>
+                            </Card>
+                        ))}
+
+                    </div>
                 </div>
                 <div style={{ margin: "0px 50px" }}>
                     <h3>Members:</h3>
                     <ul>
                         {group.members.map(member => (
-                            <li key={member.id}>{member.name}</li>
+                            <Card key={member.id} style={{ padding: "10px", margin: "10px 0" }}>
+                                {member.name}
+                            </Card>
                         ))}
                     </ul>
                 </div>

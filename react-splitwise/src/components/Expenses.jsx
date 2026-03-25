@@ -1,4 +1,5 @@
 function Expenses() {
+    
     return (
         <div>
             <h2>Expenses</h2>
