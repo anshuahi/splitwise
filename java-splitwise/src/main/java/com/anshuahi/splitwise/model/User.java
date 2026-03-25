@@ -2,17 +2,18 @@ package com.anshuahi.splitwise.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
 @Entity
-@Data
+@Setter
 @Table(name = "users")
 @Builder
 @NoArgsConstructor

@@ -1,7 +1,6 @@
 package com.anshuahi.splitwise.service;
 
-import com.anshuahi.splitwise.dto.ExpenseDto;
-import com.anshuahi.splitwise.dto.SplitDto;
+import com.anshuahi.splitwise.dto.*;
 import com.anshuahi.splitwise.model.Expense;
 import com.anshuahi.splitwise.model.ExpenseGroup;
 import com.anshuahi.splitwise.model.Split;
@@ -38,6 +37,7 @@ public class ExpenseService {
         ExpenseGroup expenseGroup = groupRepository.findById(expenseDto.getGroupId())
                 .orElseThrow(() -> new RuntimeException("Group not found"));
         expense.setExpenseGroup(expenseGroup);
+        expense.setSplitType(expenseDto.getSplitType());
         expense.setTotalAmount(expenseDto.getTotalAmount());
         User addedByUser = userRepository.findById(expenseDto.getAddedBy()).orElseThrow(
                 () -> new RuntimeException("User with id " + expenseDto.getAddedBy() + " not found")
@@ -48,6 +48,7 @@ public class ExpenseService {
 
         expense.setAddedBy(addedByUser);
         expense.setPaidBy(paidByUser);
+        expenseRepository.save(expense);
         for(SplitDto splitdto: expenseDto.getMembersContributed()){
             Split split = new Split();
 
@@ -63,11 +64,26 @@ public class ExpenseService {
         return expense;
     }
 
-
-
     public String addExpense(ExpenseDto expenseRequest){
         Expense expense = createExpense(expenseRequest);
-        expenseRepository.save(expense);
         return "Expense added successfully";
     }
+
+    public List<ExpenseResponseDto> getExpenses(Long groupId){
+        List<Expense> expenseList = expenseRepository.findByExpenseGroupId(groupId);
+        return expenseList.stream().map(
+        expense -> {
+            List<SplitResponseDto> splitList = splitRepository.findByExpenseId(expense.getId())
+                    .stream().map(
+                            split -> {
+                                return new SplitResponseDto(split.getId(), new UserDto(split.getUser()), split.getAmount());
+                            }
+                    ).toList();
+            System.out.println(splitList);
+            return new ExpenseResponseDto(expense, splitList);
+        }
+).toList();
+    }
+
+
 }

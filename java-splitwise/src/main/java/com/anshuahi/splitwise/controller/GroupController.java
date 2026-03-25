@@ -4,7 +4,6 @@ import com.anshuahi.splitwise.dto.CreateGroupDto;
 import com.anshuahi.splitwise.dto.CreateGroupRequest;
 import com.anshuahi.splitwise.dto.ExpenseGroupDto;
 import com.anshuahi.splitwise.dto.GroupDetailsDto;
-import com.anshuahi.splitwise.model.ExpenseGroup;
 import com.anshuahi.splitwise.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,7 @@ public class GroupController {
     @PostMapping("/create-group")
     public ResponseEntity<CreateGroupDto> createGroup(@RequestBody CreateGroupRequest request){
         System.out.println(request);
-        return ResponseEntity.ok(groupService.createGroup(request));
+        return ResponseEntity.ok(groupService.upsertGroup(request));
     }
 
     @GetMapping("/my-groups")
@@ -33,7 +32,7 @@ public class GroupController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<GroupDetailsDto> getGroupDetails(@PathVariable Long id){
+    public ResponseEntity<ExpenseGroupDto> getGroupDetails(@PathVariable Long id){
         return ResponseEntity.ok(groupService.fetchGroupDetails(id));
     }
 
@@ -41,5 +40,12 @@ public class GroupController {
     public  ResponseEntity<String> deleteGroup(@PathVariable Long id){
         System.out.println(id);
         return ResponseEntity.ok(groupService.deleteGroupById(id));
+    }
+
+    @PutMapping("/update-group")
+    public ResponseEntity<CreateGroupDto> updateGroup(@RequestBody CreateGroupRequest request){
+        System.out.println(request);
+        return ResponseEntity.ok(groupService.upsertGroup(request));
+//        return ResponseEntity.ok("Added");
     }
 }

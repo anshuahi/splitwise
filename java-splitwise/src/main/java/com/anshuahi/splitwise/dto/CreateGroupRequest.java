@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class CreateGroupRequest {
+    private Long id;
     private String name;
     private Long createdBy;
     private List<Long> userIds;

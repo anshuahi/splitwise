@@ -1,17 +1,11 @@
 package com.anshuahi.splitwise.model;
 
-import com.anshuahi.splitwise.dto.ExpenseDto;
-import com.anshuahi.splitwise.dto.SplitDto;
-import com.anshuahi.splitwise.repository.GroupRepository;
-import com.anshuahi.splitwise.repository.UserRepository;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-@Data
+@Getter
+@Setter
 @Entity
 public class Expense {
     @Id
@@ -33,6 +27,8 @@ public class Expense {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private ExpenseGroup expenseGroup;
+
+    private String splitType;
 
     public Expense(){}
 

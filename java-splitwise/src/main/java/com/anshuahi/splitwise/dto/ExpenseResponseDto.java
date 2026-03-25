@@ -13,20 +13,22 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExpenseResponseDto {
+    private Long id;
     private String description;
-    private User paidBy;
-    private User addedBy;
+    private UserDto paidBy;
+    private UserDto addedBy;
     private Double totalAmount;
-    private List<Split> memberContribution;
+    private List<SplitResponseDto> memberContribution;
     private String splitType;
 
 
-    public ExpenseResponseDto(Expense expense){
+    public ExpenseResponseDto(Expense expense, List<SplitResponseDto> splitList){
+        this.id = expense.getId();
         this.description = expense.getDescription();
-        this.paidBy = expense.getPaidBy();
-        this.addedBy = expense.getAddedBy();
+        this.paidBy = new UserDto(expense.getPaidBy());
+        this.addedBy = new UserDto(expense.getAddedBy());
         this.totalAmount = expense.getTotalAmount();
-//        this.memberContribution = expense.getSplitList();
-//        this.splitType = expense.gets
+        this.memberContribution = splitList;
+        this.splitType = expense.getSplitType();
     }
 }
