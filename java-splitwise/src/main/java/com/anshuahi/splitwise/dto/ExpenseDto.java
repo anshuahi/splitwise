@@ -10,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExpenseDto {
+    private Long id;
     private String description;
     private Long groupId;
     private Long paidBy;

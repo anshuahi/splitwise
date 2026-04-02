@@ -1,12 +1,19 @@
 package com.anshuahi.splitwise.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class Expense {
     @Id
     @GeneratedValue
@@ -30,6 +37,8 @@ public class Expense {
 
     private String splitType;
 
-    public Expense(){}
+    @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Split> splits;
 
 }

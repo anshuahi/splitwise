@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import api from "../../api";
 import { useParams } from "react-router-dom";
 import AddExpenseModal from "../expenses/AddExpenseModal";
-import { Card, Chip, Typography } from "@mui/material";
+import { Card } from "@mui/material";
+import ExpenseCard from "../expenses/ExpenseCard";
 
 function GroupDetails() {
     const { id } = useParams();
@@ -11,7 +12,7 @@ function GroupDetails() {
     const [isAddExpenseModalOpen, setIsAddExpenseModalOpen] = useState(false);
 
 
-    const fetchGroupDetails = async (id) => {
+    const fetchGroupDetails = async () => {
         try {
             const response = await api.get(`/groups/${id}`);
             setGroup(response.data);
@@ -20,52 +21,41 @@ function GroupDetails() {
         }
     };
 
-    const fetchGroupExpenses = async (id) => {
+
+    const fetchGroupExpenses = async () => {
         try {
-            const response = await api.get(`/expenses/group-expenses/${id}`);
+            const response = await api.get(`/expenses/groups/${id}`);
             setExpenses(response.data);
         } catch (error) {
             console.error("Error fetching group expenses:", error);
         }
     }
+
     useEffect(() => {
-        fetchGroupDetails(id);
-        fetchGroupExpenses(id);
+        if (id == null) return;
+        fetchGroupDetails();
+        fetchGroupExpenses();
     }, [id]);
 
-    const addExpense = (
-        description,
-        amount,
-        groupId,
-        paidBy,
-        splitBetween,
-        splitType
-    ) => {
-        // Logic to add a new expense to the group
-        const formdata = {
-            description,
-            amount,
-            groupId,
-            paidBy,
-            addedBy: paidBy,
-            splitBetween,
-            splitType
+    const handleDeleteExpense = async (id) => {
+        try {
+            console.log("Deleting expense with id:", id);
+            const response = await api.delete(`/expenses/${id}`);
+            fetchGroupExpenses();
+            console.log(response.data);
+        } catch (error) {
+            console.error("Error deleting expense:", error);
         }
+    };
+    const addExpense = (
+        payload
+    ) => {
 
-    
         const addExpenseToGroup = async () => {
             try {
-                const response = await api.post("/expenses/add-expense", {
-                    description,
-                    groupId,
-                    totalAmount: amount,
-                    paidBy,
-                    membersContributed: splitBetween,
-                    splitType,
-                    addedBy: paidBy
-                }
+                const response = await api.post("/expenses", payload
                 );
-                fetchGroupExpenses(id);
+                fetchGroupExpenses();
                 // Optionally, you can fetch the updated group details here to reflect the new expense
             } catch (error) {
                 console.error("Error adding expense:", error);
@@ -104,30 +94,13 @@ function GroupDetails() {
                     </div>
                     <div>
                         {expenses.map((expense) => (
-                            <Card
+                            <ExpenseCard
                                 key={expense.id}
-                                style={{ padding: "10px", margin: "30px", width: "400px" }}
-                            >
-                                {/* Header */}
-                                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                    <Typography variant="h6" style={{ fontWeight: "900" }}>
-                                        {expense.description}
-                                    </Typography>
-
-                                    <Typography>
-                                        ₹{expense.totalAmount} (Paid By: {expense.paidBy?.name})
-                                    </Typography>
-                                </div>
-
-                                {/* Members */}
-                                <div style={{ marginTop: "10px" }}>
-                                    {expense.memberContribution?.map((member) => (
-                                        <Chip key={member.memberId} label={`${member.user.name} : ₹${member.amount}`} style={{ margin: "5px" }}>
-
-                                        </Chip>
-                                    ))}
-                                </div>
-                            </Card>
+                                expense={expense}
+                                handleDeleteExpense={handleDeleteExpense}
+                                addExpense={addExpense}
+                                group={group}
+                            />
                         ))}
 
                     </div>

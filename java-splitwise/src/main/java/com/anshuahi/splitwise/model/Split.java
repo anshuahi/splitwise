@@ -1,6 +1,7 @@
 package com.anshuahi.splitwise.model;
 
 import com.anshuahi.splitwise.dto.SplitDto;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,5 +28,6 @@ public class Split {
 
     @ManyToOne
     @JoinColumn(name = "expense_id")
+    @JsonBackReference
     private Expense expense;
 }

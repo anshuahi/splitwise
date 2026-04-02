@@ -31,8 +31,18 @@ public class ExpenseService {
     private SplitRepository splitRepository;
 
     @Transactional
-    public Expense createExpense(ExpenseDto expenseDto){
-        Expense expense = new Expense();
+    public String upsertExpense(ExpenseDto expenseDto){
+        Expense expense;
+
+        // 1. fetch
+        if(expenseDto.getId() != null){
+            expense = expenseRepository.findById(expenseDto.getId())
+                    .orElseThrow(() -> new RuntimeException("Expense not found"));
+//            expense.getSplits().clear();
+        }
+        else {
+            expense = new Expense();
+        }
         expense.setDescription(expenseDto.getDescription());
         ExpenseGroup expenseGroup = groupRepository.findById(expenseDto.getGroupId())
                 .orElseThrow(() -> new RuntimeException("Group not found"));
@@ -48,25 +58,30 @@ public class ExpenseService {
 
         expense.setAddedBy(addedByUser);
         expense.setPaidBy(paidByUser);
-        expenseRepository.save(expense);
-        for(SplitDto splitdto: expenseDto.getMembersContributed()){
-            Split split = new Split();
+        List<Split> splitList = expenseDto.getMembersContributed().stream().map(
+                member -> {
+                    User user = userRepository.findById(member.getMemberId()).orElseThrow(
+                            () -> new RuntimeException("User with id " + member.getMemberId() + " not found")
+                    );
 
-            split.setAmount(splitdto.getAmount());
-
-            User user = userRepository.findById(splitdto.getMemberId()).orElseThrow(
-                    () -> new RuntimeException("User with id " + splitdto.getMemberId() + " not found")
-            );
-            split.setUser(user);
-            split.setExpense(expense);
-            splitRepository.save(split);
+                    Split split = new Split();
+                    split.setAmount(member.getAmount());
+                    split.setUser(user);
+                    split.setExpense(expense);
+                    return split;
+                }
+        ).toList();
+        if(expenseDto.getId() == null){
+            expense.setSplits(splitList);
         }
-        return expense;
-    }
-
-    public String addExpense(ExpenseDto expenseRequest){
-        Expense expense = createExpense(expenseRequest);
-        return "Expense added successfully";
+        else {
+            expense.getSplits().clear();
+            expense.getSplits().addAll(splitList);
+        }
+        expenseRepository.save(expense);
+        return expenseDto.getId() != null
+                ? "Expense updated successfully"
+                : "Expense added successfully";
     }
 
     public List<ExpenseResponseDto> getExpenses(Long groupId){
@@ -79,11 +94,16 @@ public class ExpenseService {
                                 return new SplitResponseDto(split.getId(), new UserDto(split.getUser()), split.getAmount());
                             }
                     ).toList();
-            System.out.println(splitList);
             return new ExpenseResponseDto(expense, splitList);
         }
 ).toList();
     }
 
-
+    @Transactional
+    public String deleteExpense(Long expenseId){
+        Expense expense = expenseRepository.findById(expenseId)
+                        .orElseThrow(() -> new RuntimeException("Expense not found"));
+        expenseRepository.delete(expense);
+        return "Expense deleted successfully";
+    }
 }

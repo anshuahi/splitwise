@@ -1,48 +1,60 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { Button, ButtonGroup, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup, TextField } from '@mui/material';
+import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Select, TextField } from '@mui/material';
 
-const AddExpenseModal = ({ group, isOpen, onClose, onCreate }) => {
+const AddExpenseModal = ({ group, isOpen, onClose, onCreate, expense = null }) => {
     const { user } = useAuth();
     const [description, setDescription] = useState("");
     const [amount, setAmount] = useState("");
+    const [paidBy, setPaidBy] = useState(user.id);
     const [selectedMembers, setSelectedMembers] = useState([]);
     const [splitType, setSplitType] = useState("Equal");
 
+
     useEffect(() => {
-        setSelectedMembers(
-            group.members.map(member => member.id)
-        );
-    }, [group])
+        if (expense) {
+            setDescription(expense.description);
+            setAmount(expense.totalAmount);
+            setPaidBy(expense.paidBy.id);
+            setSplitType(expense.splitType);
+
+            setSelectedMembers(
+                expense.memberContribution.map(m => m.user.id)
+            );
+        }
+        else {
+            setDescription("");
+            setAmount("");
+            setPaidBy(user.id);
+            setSplitType("Equal");
+            setSelectedMembers(group.members.map(m => m.id));
+        }
+    }, [expense, group, user])
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(group)
-        const membersContributed = selectedMembers.map(memberId => {
-            return {
-                memberId,
-                amount: (user.id === memberId) ? amount - amount / selectedMembers.length : 
-                splitType === "Equal" ? -amount / selectedMembers.length : null // Adjust amount based on split type
-            }
-        });
-        console.log("Members contributed:", membersContributed);
-        console.log(description,
-            amount,
-            {groupId: group.id},
-            {paidBy: user.id},
-            membersContributed,
-            splitType);
-        onCreate(
+
+        const membersContributed = selectedMembers.map(memberId => ({
+            memberId,
+            amount:
+                splitType === "Equal"
+                    ? -amount / selectedMembers.length
+                    : null
+        }));
+
+        const payload = {
+            id: expense?.id, // 👈 important for edit
             description,
-            amount,
-            group.id,
-            user.id,
+            totalAmount: amount,
+            groupId: group.id,
+            addedBy: user.id,
+            paidBy,
             membersContributed,
             splitType
-        );
-        setDescription("");
-        setAmount("");
-        setSelectedMembers(group.members.map(member => member.id));
+        };
+
+        onCreate(payload); // same function handles both
+
         onClose();
     }
 
@@ -103,7 +115,7 @@ const AddExpenseModal = ({ group, isOpen, onClose, onCreate }) => {
                                         name="radio-buttons-group"
                                         row
                                         value={splitType}
-                                        onChange={(e) => setSplitType(e.target.value)} 
+                                        onChange={(e) => setSplitType(e.target.value)}
                                     >
                                         <FormControlLabel value="Equal" control={<Radio />} label="Equal" />
                                         <FormControlLabel value="Percentage" control={<Radio />} label="Percentage" />
@@ -112,7 +124,27 @@ const AddExpenseModal = ({ group, isOpen, onClose, onCreate }) => {
                                 </FormControl>
                             </div>
 
-                            <h4> Split between: </h4>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <h4> Split between: </h4>
+                                <div>
+                                    <FormControl size="small" sx={{ m: 1, minWidth: 120 }}>
+                                        <InputLabel id="demo-simple-select-label">Paid By</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={paidBy}
+                                            label="Paid By"
+                                            onChange={(e) => setPaidBy(e.target.value)}
+                                        >
+                                            {group.members.map(member => (
+                                                <MenuItem key={member.id} value={member.id}>
+                                                    {member.name}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                            </div>
                             <FormGroup style={{ maxHeight: "100px", flexFlow: "wrap", overflowY: "scroll" }}>
                                 {group.members.map(member => (
                                     <FormControlLabel
@@ -153,6 +185,7 @@ const AddExpenseModal = ({ group, isOpen, onClose, onCreate }) => {
 
 const styles = {
     overlay: {
+        zIndex:1,
         position: "fixed",
         top: 0,
         left: 0,
